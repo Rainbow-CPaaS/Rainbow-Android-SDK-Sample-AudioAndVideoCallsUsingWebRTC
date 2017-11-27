@@ -48,7 +48,7 @@ public class LoginFragment extends Fragment {
             }
         });
 
-        m_loginView.setText(RainbowSdk.instance().contacts().getUserLoginInCache());
+        m_loginView.setText(RainbowSdk.instance().myProfile().getUserLoginInCache());
 
         return fragmentView;
     }
