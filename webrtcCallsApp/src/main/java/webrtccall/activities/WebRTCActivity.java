@@ -17,6 +17,7 @@ import com.ale.infra.application.RainbowContext;
 import com.ale.infra.manager.TelephonyMgr;
 import com.ale.infra.manager.call.ITelephonyListener;
 import com.ale.infra.manager.call.MediaState;
+import com.ale.infra.manager.call.PeerSession;
 import com.ale.infra.manager.call.Statistics;
 import com.ale.infra.manager.call.WebRTCCall;
 import com.ale.rainbowsdk.RainbowSdk;
@@ -28,9 +29,11 @@ import org.webrtc.SurfaceViewRenderer;
 import org.webrtc.VideoRenderer;
 import org.webrtc.VideoTrack;
 
+import java.util.Map;
+
 import webrtccall.callapplication.R;
 
-public class WebRTCActivity extends Activity implements ITelephonyListener, TelephonyMgr.IStreamManagementListener, TelephonyMgr.ILocalVideoTrackListener {
+public class WebRTCActivity extends Activity implements ITelephonyListener {
 
     private final static String LOG_TAG = "WebRTCActivity";
 
@@ -232,21 +235,27 @@ public class WebRTCActivity extends Activity implements ITelephonyListener, Tele
         m_littleVideoView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                m_localVideoOnLittleView = !m_localVideoOnLittleView;
-                if (m_localVideoOnLittleView) {
-                    renderRemoteVideo(RainbowSdk.instance().webRTC().getAddedStream(), m_bigVideoView);
-                    renderLocalVideo(m_localVideoTrack, m_littleVideoView);
-                } else {
-                    renderRemoteVideo(RainbowSdk.instance().webRTC().getAddedStream(), m_littleVideoView);
-                    renderLocalVideo(m_localVideoTrack, m_bigVideoView);
+                //m_localVideoOnLittleView = !m_localVideoOnLittleView;
+                Map<PeerSession.PeerSessionType, MediaStream> streams = RainbowSdk.instance().webRTC().getAddedStreams();
+                if (streams.containsKey(PeerSession.PeerSessionType.AUDIO_VIDEO_SHARING)) {
+                    MediaStream stream = streams.get(PeerSession.PeerSessionType.AUDIO_VIDEO_SHARING);
+                    if (m_localVideoOnLittleView) {
+
+                        renderRemoteVideo(stream, m_bigVideoView);
+                        renderLocalVideo(RainbowSdk.instance().webRTC().getLocalVideoTrack(), m_littleVideoView);
+                    } else {
+                        renderRemoteVideo(stream, m_littleVideoView);
+                        renderLocalVideo(RainbowSdk.instance().webRTC().getLocalVideoTrack(), m_bigVideoView);
+                    }
                 }
+
             }
         });
 
         // Listen to events
         RainbowSdk.instance().webRTC().registerTelephonyListener(this);
-        RainbowSdk.instance().webRTC().setStreamAddedListener(this);
-        RainbowSdk.instance().webRTC().setLocalVideoTrackListener(this);
+        //RainbowSdk.instance().webRTC().setStreamAddedListener(this);
+        //RainbowSdk.instance().webRTC().setLocalVideoTrackListener(this);
 
         updateLayoutWithCall(RainbowSdk.instance().webRTC().getCurrentCall());
 
@@ -340,6 +349,19 @@ public class WebRTCActivity extends Activity implements ITelephonyListener, Tele
                     m_bigVideoView.setVisibility(call.wasInitiatedWithVideo() ? View.VISIBLE : View.GONE);
                     m_littleVideoView.setVisibility(call.wasInitiatedWithVideo() ? View.VISIBLE : View.GONE);
                 }
+                //m_localVideoOnLittleView = !m_localVideoOnLittleView;
+                Map<PeerSession.PeerSessionType, MediaStream> streams = RainbowSdk.instance().webRTC().getAddedStreams();
+                if (streams.containsKey(PeerSession.PeerSessionType.AUDIO_VIDEO_SHARING)) {
+                    MediaStream stream = streams.get(PeerSession.PeerSessionType.AUDIO_VIDEO_SHARING);
+                    if (m_localVideoOnLittleView) {
+
+                        renderRemoteVideo(stream, m_bigVideoView);
+                        renderLocalVideo(RainbowSdk.instance().webRTC().getLocalVideoTrack(), m_littleVideoView);
+                    } else {
+                        renderRemoteVideo(stream, m_littleVideoView);
+                        renderLocalVideo(RainbowSdk.instance().webRTC().getLocalVideoTrack(), m_bigVideoView);
+                    }
+                }
             }
         });
     }
@@ -354,6 +376,7 @@ public class WebRTCActivity extends Activity implements ITelephonyListener, Tele
         }
     }
 
+    /*
     @Override
     public void onStreamAdded(final MediaStream stream) {
         Log.getLogger().verbose(LOG_TAG, "stream added");
@@ -369,8 +392,9 @@ public class WebRTCActivity extends Activity implements ITelephonyListener, Tele
                 }
             }
         });
-    }
+    }*/
 
+    /*
     @Override
     public void onStreamRemoved(final MediaStream stream) {
         Log.getLogger().verbose(LOG_TAG, "stream removed");
@@ -386,17 +410,8 @@ public class WebRTCActivity extends Activity implements ITelephonyListener, Tele
                 }
             }
         });
-    }
+    }*/
 
-    @Override
-    public void onQualityChanged(Statistics.Quality quality) {
-
-    }
-
-    @Override
-    public void onAudioConnectionChange(boolean connected) {
-
-    }
 
     private void renderRemoteVideo(MediaStream stream, SurfaceViewRenderer surfaceViewRenderer)
     {
@@ -413,15 +428,19 @@ public class WebRTCActivity extends Activity implements ITelephonyListener, Tele
         surfaceViewRenderer.requestLayout();
     }
 
-    private void renderLocalVideo(VideoTrack videoTrack, SurfaceViewRenderer surfaceViewRenderer)
-    {
-        if (m_localVideoRenderer != null)
-            videoTrack.removeRenderer(m_localVideoRenderer);
+    private void renderLocalVideo(VideoTrack videoTrack, SurfaceViewRenderer surfaceViewRenderer) {
+        if (videoTrack != null) {
+            if (m_localVideoRenderer != null)
+                videoTrack.removeRenderer(m_localVideoRenderer);
 
-        m_localVideoRenderer = new VideoRenderer(surfaceViewRenderer);
-        videoTrack.addRenderer(m_localVideoRenderer);
+            m_localVideoRenderer = new VideoRenderer(surfaceViewRenderer);
+
+            videoTrack.addRenderer(m_localVideoRenderer);
+        }
+
     }
 
+    /*
     @Override
     public void onLocalVideoTrackCreated(final VideoTrack videoTrack) {
         runOnUiThread(new Runnable() {
@@ -435,5 +454,5 @@ public class WebRTCActivity extends Activity implements ITelephonyListener, Tele
                 }
             }
         });
-    }
+    }*/
 }

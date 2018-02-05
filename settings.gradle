@@ -1,1 +1,3 @@
 include ':webrtcCallsApp'
+include ':android_sdk'
+project(':android_sdk').projectDir=new File('../otlite_android_sdk/android_sdk')
