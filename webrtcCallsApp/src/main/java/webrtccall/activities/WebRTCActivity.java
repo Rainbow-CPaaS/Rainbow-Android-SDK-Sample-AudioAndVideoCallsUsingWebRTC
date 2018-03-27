@@ -16,10 +16,10 @@ import android.widget.RelativeLayout;
 import com.ale.infra.application.RainbowContext;
 import com.ale.infra.manager.TelephonyMgr;
 import com.ale.infra.manager.call.ITelephonyListener;
-import com.ale.infra.manager.call.MediaState;
 import com.ale.infra.manager.call.PeerSession;
 import com.ale.infra.manager.call.Statistics;
 import com.ale.infra.manager.call.WebRTCCall;
+import com.ale.rainbow.phone.session.MediaState;
 import com.ale.rainbowsdk.RainbowSdk;
 import com.ale.util.log.Log;
 

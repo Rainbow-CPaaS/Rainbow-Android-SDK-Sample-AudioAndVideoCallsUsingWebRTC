@@ -1,7 +1,8 @@
 <resources>
-    <string name="app_name">CallApplication</string>
+    <string name="app_name">WebRTC application sample</string>
+    <string name="topic_app">Rainbow SDK for Android</string>
+
     <string name="exit">exit</string>
-    <string name="topic_app">Call application...</string>
     <string name="make_call_audio">Audio call</string>
     <string name="hangup_audio_call">hangup audio call</string>
     <string name="take_call_audio">take call audio</string>

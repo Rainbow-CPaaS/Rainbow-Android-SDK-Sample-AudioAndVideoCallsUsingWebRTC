@@ -20,6 +20,9 @@ public class MyApp extends Application {
                 getString(R.string.app_name),
                 getString(R.string.topic_app),
                 Color.RED);
-        RainbowSdk.instance().initialize();
+
+        String applicationId = "YOUR APPLICATION IDENTIFIER";
+        String applicationSecret = "YOUR APPLICATION SECRET";
+        RainbowSdk.instance().initialize(applicationId, applicationSecret);
     }
 }

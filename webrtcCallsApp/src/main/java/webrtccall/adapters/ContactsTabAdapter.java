@@ -79,7 +79,7 @@ public class ContactsTabAdapter extends BaseAdapter {
     }
 
     public void updateContacts() {
-        m_roster = RainbowSdk.instance().contacts().getRainbowContacts();
+        m_roster.replaceAll(RainbowSdk.instance().contacts().getRainbowContacts().getCopyOfDataList());
         notifyDataSetChanged();
     }
 
