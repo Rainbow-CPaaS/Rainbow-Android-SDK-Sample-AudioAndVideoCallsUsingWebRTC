@@ -25,7 +25,6 @@ import webrtccall.callapplication.R;
 public class ContactsTabFragment extends Fragment implements Contact.ContactListener {
 
     private StartupActivity m_activity;
-
     private ContactsTabAdapter m_adapter;
 
     private IItemListChangeListener m_contactsListener = new IItemListChangeListener() {
@@ -47,10 +46,12 @@ public class ContactsTabFragment extends Fragment implements Contact.ContactList
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View fragmentView = inflater.inflate(R.layout.contacts_tab_fragment, container, false);
 
+        // Get the list view of all contacts
         ListView listViewContacts = (ListView)fragmentView.findViewById(R.id.list_view_contacts);
         listViewContacts.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // Get the IRainbowContact object in the adapter
                 IRainbowContact contact = (IRainbowContact)parent.getItemAtPosition(position);
 
                 if (!contact.isBot()) {
@@ -62,6 +63,7 @@ public class ContactsTabFragment extends Fragment implements Contact.ContactList
         m_adapter = new ContactsTabAdapter(m_activity);
         listViewContacts.setAdapter(m_adapter);
 
+        // Listen to contacts changes
         RainbowSdk.instance().contacts().getRainbowContacts().registerChangeListener(m_contactsListener);
 
         return fragmentView;
@@ -69,9 +71,30 @@ public class ContactsTabFragment extends Fragment implements Contact.ContactList
 
     @Override
     public void onDestroyView() {
+        // Un-listen to contacts changes
         RainbowSdk.instance().contacts().getRainbowContacts().unregisterChangeListener(m_contactsListener);
 
         super.onDestroyView();
+    }
+
+    @Override
+    public void contactUpdated(Contact updatedContact) {
+        m_activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                m_adapter.updateContacts();
+            }
+        });
+    }
+
+    @Override
+    public void onPresenceChanged(Contact contact, RainbowPresence presence) {
+
+    }
+
+    @Override
+    public void onActionInProgress(boolean clickActionInProgress) {
+
     }
 
     @Override
@@ -94,26 +117,6 @@ public class ContactsTabFragment extends Fragment implements Contact.ContactList
                 m_activity = (StartupActivity)activity;
             }
         }
-    }
-
-    @Override
-    public void contactUpdated(Contact updatedContact) {
-        m_activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                m_adapter.updateContacts();
-            }
-        });
-    }
-
-    @Override
-    public void onPresenceChanged(Contact contact, RainbowPresence presence) {
-
-    }
-
-    @Override
-    public void onActionInProgress(boolean clickActionInProgress) {
-
     }
 }
 

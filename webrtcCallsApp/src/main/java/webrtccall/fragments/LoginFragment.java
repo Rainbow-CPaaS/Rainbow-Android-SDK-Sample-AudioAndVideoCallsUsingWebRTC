@@ -1,6 +1,5 @@
 package webrtccall.fragments;
 
-
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
@@ -33,11 +32,13 @@ public class LoginFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View fragmentView = inflater.inflate(R.layout.login_fragment, container, false);
 
-        // Login view and set the default value
+        // Get the login view and set the login in cache
         m_loginView = (EditText)fragmentView.findViewById(R.id.login);
+        m_loginView.setText(RainbowSdk.instance().myProfile().getUserLoginInCache());
 
-        // Password view and set the default value
+        // Get the password view and set the password in cache
         m_passwordView = (EditText)fragmentView.findViewById(R.id.password);
+        m_passwordView.setText(RainbowSdk.instance().myProfile().getUserPasswordInCache());
 
         // Button to sign in
         Button signButton = (Button)fragmentView.findViewById(R.id.sign_button);
@@ -48,9 +49,44 @@ public class LoginFragment extends Fragment {
             }
         });
 
-        m_loginView.setText(RainbowSdk.instance().myProfile().getUserLoginInCache());
-
         return fragmentView;
+    }
+
+    private void attemptLogin() {
+        final String email = m_loginView.getText().toString();
+        final String password = m_passwordView.getText().toString();
+
+        RainbowSdk.instance().connection().start(new StartResponseListener() {
+            @Override
+            public void onStartSucceeded() {
+                RainbowSdk.instance().connection().signin(email, password, "sandbox.openrainbow.com", new SigninResponseListener() {
+                    @Override
+                    public void onSigninSucceeded() {
+                        m_activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(m_activity, "Sign in success!", Toast.LENGTH_SHORT).show();
+                                m_activity.openContactsTabFragment();
+                            }
+                        });
+                    }
+                    @Override
+                    public void onRequestFailed(final RainbowSdk.ErrorCode errorCode, final String s) {
+                        m_activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(m_activity, "Sign in failed: " + errorCode, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                });
+            }
+
+            @Override
+            public void onRequestFailed(RainbowSdk.ErrorCode errorCode, String err) {
+                Log.getLogger().error(LOG_TAG, "The Rainbow SDK service has encountered an error when trying to start.");
+            }
+        });
     }
 
     @Override
@@ -73,43 +109,5 @@ public class LoginFragment extends Fragment {
                 m_activity = (StartupActivity)activity;
             }
         }
-    }
-
-
-    private void attemptLogin() {
-        final String email = m_loginView.getText().toString();
-        final String password = m_passwordView.getText().toString();
-
-        RainbowSdk.instance().connection().start(new StartResponseListener() {
-            @Override
-            public void onStartSucceeded() {
-                RainbowSdk.instance().connection().signin(email, password, "sandbox.openrainbow.com", new SigninResponseListener() {
-                    @Override
-                    public void onSigninSucceeded() {
-                        m_activity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                m_activity.openContactsTabFragment();
-                            }
-                        });
-                    }
-                    @Override
-                    public void onRequestFailed(final RainbowSdk.ErrorCode errorCode, final String s) {
-                        m_activity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(m_activity, "Signin failed: " + errorCode, Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-                });
-            }
-
-            @Override
-            public void onRequestFailed(RainbowSdk.ErrorCode errorCode, String err) {
-                Log.getLogger().error(LOG_TAG, "SDK start failure !!!");
-            }
-        });
-
     }
 }

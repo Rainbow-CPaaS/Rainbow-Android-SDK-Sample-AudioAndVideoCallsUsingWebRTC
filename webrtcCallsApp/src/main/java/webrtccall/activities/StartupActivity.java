@@ -130,24 +130,6 @@ public class StartupActivity  extends AppCompatActivity implements ITelephonyLis
     @Override
     public void onCallAdded(WebRTCCall call) {
         startActivity(new Intent(this, WebRTCActivity.class));
-//        boolean hasCameraPermission = hasCameraPermission();
-//        boolean hasMicrophonePermission = hasMicrophonePermission();
-//
-//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || call.wasInitiatedWithVideo() && hasCameraPermission && hasMicrophonePermission || !call.wasInitiatedWithVideo() && hasMicrophonePermission) {
-//            startActivity(new Intent(this, WebRTCActivity.class));
-//        } else {
-//            if (call.wasInitiatedWithVideo()) {
-//                if (!hasCameraPermission && !hasMicrophonePermission) {
-//                    requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA}, REQUEST_TAKE_VIDEO_CALL);
-//                } else if (!hasCameraPermission) {
-//                    requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_TAKE_VIDEO_CALL);
-//                } else if (!hasMicrophonePermission) {
-//                    requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_TAKE_VIDEO_CALL);
-//                }
-//            } else if (!hasMicrophonePermission) {
-//                requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_TAKE_AUDIO_CALL);
-//            }
-//        }
     }
 
     @Override

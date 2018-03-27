@@ -14,10 +14,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.ale.infra.application.RainbowContext;
-import com.ale.infra.manager.TelephonyMgr;
 import com.ale.infra.manager.call.ITelephonyListener;
 import com.ale.infra.manager.call.PeerSession;
-import com.ale.infra.manager.call.Statistics;
 import com.ale.infra.manager.call.WebRTCCall;
 import com.ale.rainbow.phone.session.MediaState;
 import com.ale.rainbowsdk.RainbowSdk;
@@ -49,8 +47,6 @@ public class WebRTCActivity extends Activity implements ITelephonyListener {
     private VideoRenderer m_remoteVideoRenderer;
     private VideoRenderer m_localVideoRenderer;
     private boolean m_localVideoOnLittleView = true;
-
-    private VideoTrack m_localVideoTrack;
 
     private MediaPlayer m_mediaPlayer;
 
@@ -170,13 +166,13 @@ public class WebRTCActivity extends Activity implements ITelephonyListener {
             }
         });
 
-        // Remote video view
+        // Big video view
         m_bigVideoView = (SurfaceViewRenderer) findViewById(R.id.big_video_view);
         m_bigVideoView.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL);
         m_bigVideoView.setMirror(true);
         m_bigVideoView.requestLayout();
 
-        // Local video view
+        // Little video  (in top right)
         m_littleVideoView = (SurfaceViewRenderer) findViewById(R.id.little_video_view);
         m_littleVideoView.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL);
         m_littleVideoView.setZOrderMediaOverlay(true);
@@ -235,12 +231,11 @@ public class WebRTCActivity extends Activity implements ITelephonyListener {
         m_littleVideoView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //m_localVideoOnLittleView = !m_localVideoOnLittleView;
+                m_localVideoOnLittleView = !m_localVideoOnLittleView;
                 Map<PeerSession.PeerSessionType, MediaStream> streams = RainbowSdk.instance().webRTC().getAddedStreams();
                 if (streams.containsKey(PeerSession.PeerSessionType.AUDIO_VIDEO_SHARING)) {
                     MediaStream stream = streams.get(PeerSession.PeerSessionType.AUDIO_VIDEO_SHARING);
                     if (m_localVideoOnLittleView) {
-
                         renderRemoteVideo(stream, m_bigVideoView);
                         renderLocalVideo(RainbowSdk.instance().webRTC().getLocalVideoTrack(), m_littleVideoView);
                     } else {
@@ -254,8 +249,6 @@ public class WebRTCActivity extends Activity implements ITelephonyListener {
 
         // Listen to events
         RainbowSdk.instance().webRTC().registerTelephonyListener(this);
-        //RainbowSdk.instance().webRTC().setStreamAddedListener(this);
-        //RainbowSdk.instance().webRTC().setLocalVideoTrackListener(this);
 
         updateLayoutWithCall(RainbowSdk.instance().webRTC().getCurrentCall());
 
@@ -376,43 +369,6 @@ public class WebRTCActivity extends Activity implements ITelephonyListener {
         }
     }
 
-    /*
-    @Override
-    public void onStreamAdded(final MediaStream stream) {
-        Log.getLogger().verbose(LOG_TAG, "stream added");
-        runOnUiThread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                if (m_localVideoOnLittleView) {
-                    renderRemoteVideo(stream, m_bigVideoView);
-                } else {
-                    renderRemoteVideo(stream, m_littleVideoView);
-                }
-            }
-        });
-    }*/
-
-    /*
-    @Override
-    public void onStreamRemoved(final MediaStream stream) {
-        Log.getLogger().verbose(LOG_TAG, "stream removed");
-        runOnUiThread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                if (RainbowContext.getInfrastructure().getCapabilities().isVideoWebRtcAllowed() && stream.videoTracks.size() > 0)
-                {
-                    stream.videoTracks.get(0).removeRenderer(m_remoteVideoRenderer);
-                    m_remoteVideoRenderer.dispose();
-                }
-            }
-        });
-    }*/
-
-
     private void renderRemoteVideo(MediaStream stream, SurfaceViewRenderer surfaceViewRenderer)
     {
         // set the remote renderer to this incoming m_stream:
@@ -439,20 +395,4 @@ public class WebRTCActivity extends Activity implements ITelephonyListener {
         }
 
     }
-
-    /*
-    @Override
-    public void onLocalVideoTrackCreated(final VideoTrack videoTrack) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                m_localVideoTrack = videoTrack;
-                if (m_localVideoOnLittleView) {
-                    renderLocalVideo(videoTrack, m_littleVideoView);
-                } else {
-                    renderLocalVideo(videoTrack, m_bigVideoView);
-                }
-            }
-        });
-    }*/
 }

@@ -27,20 +27,12 @@ public class ContactsTabAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        if (m_roster != null)
-        {
-            return m_roster.getCount();
-        }
-        return 0;
-
+        return m_roster.getCount();
     }
 
     @Override
     public Object getItem(int position) {
-        if (m_roster.getCount() > position) {
-            return m_roster.get(position);
-        }
-        return null;
+        return m_roster.get(position);
     }
 
     @Override
@@ -50,7 +42,6 @@ public class ContactsTabAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-
         MyViewHolder myViewHolder;
 
         if (convertView == null) {
@@ -66,9 +57,17 @@ public class ContactsTabAdapter extends BaseAdapter {
             myViewHolder = (MyViewHolder)convertView.getTag();
         }
 
+        // Get the IRainbowContact object
         IRainbowContact contact = (IRainbowContact)getItem(position);
-        myViewHolder.displayName.setText(contact.getFirstName() + " " + contact.getLastName());
+
+        // Set the display name
+        String displayName = contact.getFirstName() + " " + contact.getLastName();
+        myViewHolder.displayName.setText(displayName);
+
+        // Set the company name
         myViewHolder.company.setText(contact.getCompanyName());
+
+        // Set the photo if it exists, otherwise just put a default picture
         if (contact.getPhoto() == null) {
             myViewHolder.photo.setImageResource(R.drawable.contact);
         } else {
@@ -79,6 +78,10 @@ public class ContactsTabAdapter extends BaseAdapter {
     }
 
     public void updateContacts() {
+        // Replace all contacts
+        // Be careful to NEVER modify directly the RainbowSdk.instance().contacts().getRainbowContacts()
+        // For example, do NOT do that:
+        // m_roster = RainbowSdk.instance().contacts().getRainbowContacts();
         m_roster.replaceAll(RainbowSdk.instance().contacts().getRainbowContacts().getCopyOfDataList());
         notifyDataSetChanged();
     }
