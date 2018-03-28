@@ -290,10 +290,10 @@ public class WebRTCActivity extends Activity implements ITelephonyListener {
         }
 
         try {
-            String ringtoneString = "android.resource://call.callapplication/" + R.raw.call;
+            String ringtoneString = "android.resource://call.callapplication/" + R.raw.incoming_ringing;
 
             if (RainbowSdk.instance().webRTC().getCurrentCall().getState() == MediaState.RINGING_OUTGOING) {
-                ringtoneString = "android.resource://call.callapplication/" + R.raw.outgoingrings;
+                ringtoneString = "android.resource://call.callapplication/" + R.raw.outgoing_ringing;
             }
 
             Uri ringtoneUri = Uri.parse(ringtoneString);
